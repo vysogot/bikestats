@@ -1,11 +1,10 @@
-# rack-app.rb example application
+# Bikeramp
 
-Simple example app for Rack::App microframework 
+Simple API for adding bike trips and getting weekly and monthly stats.
 
-## Install 
+## Install
 
-  $ bundle install 
-  
-  $ rackup 
-  
-  $ sh ping.sh
+  $ bundle install
+
+  $ rackup
+
