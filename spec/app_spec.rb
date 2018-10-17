@@ -19,6 +19,13 @@ describe App do
 
     it { expect(subject.status).to eq 201 }
     it { expect(subject.body.join).to eq "Trip added!" }
+
+    it 'should add it to the database' do
+      expect(Trip.count).to eq 0
+      subject
+      expect(Trip.count).to eq 1
+    end
+
   end
 
   describe 'Get weekly stats' do
@@ -40,7 +47,6 @@ describe App do
   end
 
   describe 'raises error when wrong parameters for adding a trip' do
-    # error handled example
     subject{ get(url: '/api/trips') }
 
     it { expect(subject.body.join).to eq '{:error=>"Wrong parameters, dude!"}' }

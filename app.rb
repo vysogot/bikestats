@@ -1,11 +1,13 @@
 require 'bundler'
 require 'json'
+require 'mongoid'
+
 Bundler.require
 Loader.autoload
 
 class App < Rack::App
 
-  mount SomeAppClass
+  mount Trip
 
   headers 'Access-Control-Allow-Origin' => '*',
     'Access-Control-Expose-Headers' => 'X-My-Custom-Header, X-Another-Custom-Header'
@@ -16,8 +18,8 @@ class App < Rack::App
 
   desc 'Create trip'
   get '/api/trips' do
-    p params
     unless params['start_address'] == nil
+      Trip.create!(params)
       response.status = 201
       'Trip added!'
     else

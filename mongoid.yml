@@ -1,0 +1,13 @@
+development:
+  clients:
+    default:
+      database: bikeramp
+      hosts:
+        - localhost:27017
+
+test:
+  clients:
+    default:
+      database: bikeramp_test
+      hosts:
+        - localhost:27017
