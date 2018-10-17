@@ -29,7 +29,7 @@ class App < Rack::App
 
   desc 'Get weekly stats'
   get '/api/stats/weekly' do
-    'Weekly stats!'
+    Trip.weekly_stats.to_json
   end
 
   desc 'Get monthly stats'

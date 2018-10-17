@@ -31,9 +31,17 @@ describe App do
   describe 'Get weekly stats' do
     subject{ get(url: '/api/stats/weekly') }
 
-    it { expect(subject.body.join).to eq 'Weekly stats!'}
-
     it { expect(subject.status).to eq 200 }
+
+    it 'should give us weekly stats' do
+
+      # 5, 10, 15, 20, 25
+      5.times {|x| create(:trip, price: (x+1)*5) }
+
+      expect(JSON.parse(subject.body.join)).to eq({
+        'total_price' => '75.00PLN'
+      })
+    end
 
   end
 
