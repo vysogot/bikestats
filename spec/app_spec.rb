@@ -35,11 +35,17 @@ describe App do
 
     it 'should give us weekly stats' do
 
-      # 5, 10, 15, 20, 25
-      5.times {|x| create(:trip, price: (x+1)*5) }
+      # 5, 10, 15, 20, 25, 30, 35 - total of 140
+      7.times do |x|
+        create(:trip, price: (x+1)*5, date: Time.now - x*24*60*60)
+      end
+
+      # not in the current week
+      create(:trip, price: 100, date: Time.now - 8*24*60*60)
+      create(:trip, price: 100, date: Time.now + 1*24*60*60)
 
       expect(JSON.parse(subject.body.join)).to eq({
-        'total_price' => '75.00PLN'
+        'total_price' => '140.00PLN'
       })
     end
 

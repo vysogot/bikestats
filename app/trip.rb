@@ -9,7 +9,12 @@ class Trip < Rack::App
 
   class << self
     def weekly_stats
-      { 'total_price': "#{sprintf("%0.02f", sum(:price))}PLN" }
+      total_price = where(
+        :date.gte => Time.now - 7*24*60*60,
+        :date.lte => Time.now
+      ).sum(:price)
+
+      { 'total_price': "#{sprintf("%0.02f", total_price)}PLN" }
     end
   end
 end
