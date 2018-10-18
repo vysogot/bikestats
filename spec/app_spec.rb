@@ -36,15 +36,17 @@ describe App do
     it 'should give us weekly stats' do
 
       total_price = 0
+      total_distance = 0
       days_in_current_week = Time.now.wday
 
       days_in_current_week.times do |day_index|
         price = (day_index + 1) * 5
-        total_price += price
+        trip = create(:trip, price: price,
+                 date: TimeHelper.beginning_of_the_week +
+                 day_index * TimeHelper.day_in_seconds)
 
-        create(:trip, price: price,
-               date: TimeHelper.beginning_of_the_week +
-               day_index * TimeHelper.day_in_seconds)
+        total_price += trip.price
+        total_distance += trip.distance
       end
 
       # previous week
@@ -58,8 +60,8 @@ describe App do
              8 * TimeHelper.day_in_seconds)
 
       expect(JSON.parse(subject.body.join)).to eq({
-        'total_distance' => '40km',
-        'total_price' => "#{total_price}.00PLN"
+        'total_distance' => "#{total_distance.round(0)}km",
+        'total_price' => "#{total_price.round(2)}PLN"
       })
     end
 
@@ -73,32 +75,31 @@ describe App do
 
     it 'should give us monthly stats' do
 
-      total_price = 0
-      days_in_current_month = Time.now.mday
+      create(:trip, date: Time.new(2018, 7, 4), price: 15, distance: 2)
+      create(:trip, date: Time.new(2018, 7, 4), price: 25, distance: 4)
+      create(:trip, date: Time.new(2018, 7, 4), price: 28.25, distance: 6)
 
-      days_in_current_month.times do |day_index|
-        price = (day_index + 1) * 5
-        total_price += price
+      create(:trip, date: Time.new(2018, 7, 5), price: 15.5, distance: 3)
 
-        create(:trip, price: price,
-               date: TimeHelper.beginning_of_the_month +
-               day_index * TimeHelper.day_in_seconds)
+
+      Timecop.freeze(Time.new(2018, 7, 14)) do
+        expect(JSON.parse(subject.body.join)).to eq(
+          JSON.parse('[
+            {
+              "day":           "July, 4th",
+              "total_distance": "12km",
+              "avg_ride":       "4km",
+              "avg_price":      "22.75PLN"
+            },
+            {
+              "day":            "July, 5th",
+              "total_distance": "3km",
+              "avg_ride":       "3km",
+              "avg_price":      "15.5PLN"
+            }
+          ]'
+        ))
       end
-
-      # previous month
-      create(:trip, price: 100,
-             date: TimeHelper.beginning_of_the_month -
-             TimeHelper.day_in_seconds)
-
-      # next month
-      create(:trip, price: 100, date:
-             TimeHelper.beginning_of_the_month +
-             32 * TimeHelper.day_in_seconds)
-
-      expect(JSON.parse(subject.body.join)).to eq({
-        'total_distance' => '40km',
-        'total_price' => "#{total_price}.00PLN"
-      })
     end
 
   end

@@ -1,14 +1,34 @@
 require 'bundler'
 require 'json'
-require 'mongoid'
-require './lib/TimeHelper.rb'
+require 'sqlite3'
+require 'active_record'
+require 'active_support'
+require './lib/TimeHelper'
+require './app/Trip'
+
+ActiveRecord::Migration.verbose = false
+
+ActiveRecord::Base.establish_connection(
+  adapter: 'sqlite3',
+  database: ':memory:'
+)
+
+ActiveRecord::Schema.define do
+  create_table :trips, force: true do |t|
+    t.string :start_address
+    t.string :destination_address
+    t.float :price
+    t.float :distance
+    t.date :date
+
+    t.timestamps
+  end
+end
 
 Bundler.require
 Loader.autoload
 
 class App < Rack::App
-
-  mount Trip
 
   headers 'Access-Control-Allow-Origin' => '*',
     'Access-Control-Expose-Headers' => 'X-My-Custom-Header, X-Another-Custom-Header'

@@ -1,40 +1,30 @@
-class Trip < Rack::App
-  include Mongoid::Document
-  include TimeHelper
-  store_in collection: "trips"
+class Trip < ActiveRecord::Base
 
-  field :start_address, type: String
-  field :destination_address, type: String
-  field :price, type: Float
-  field :date, type: Date
+  include TimeHelper
 
   class << self
     def weekly_stats
-      total_price = where(
-        :date.gte => TimeHelper.beginning_of_the_week,
-        :date.lte => Time.now
-      ).sum(:price)
+      week = select(Arel.sql('sum(price) as total_price, sum(distance) as total_distance')).where(
+        date: TimeHelper.beginning_of_the_week..Time.now
+      ).first
 
-      total_price_formatted = "#{sprintf("%0.02f", total_price)}PLN"
-
-      return {
-        'total_distance': '40km',
-        'total_price': total_price_formatted
+      {
+        total_distance: "#{week.total_distance.round(0)}km",
+        total_price: "#{week.total_price.round(2)}PLN"
       }
     end
 
     def monthly_stats
-      total_price = where(
-        :date.gte => TimeHelper.beginning_of_the_month,
-        :date.lte => Time.now
-      ).sum(:price)
-
-      total_price_formatted = "#{sprintf("%0.02f", total_price)}PLN"
-
-      return {
-        'total_distance': '40km',
-        'total_price': total_price_formatted
-      }
+      select(:date, Arel.sql('avg(price) as avg_price, avg(distance) as avg_distance, sum(distance) as total_distance')).where(
+        date: TimeHelper.beginning_of_the_month..Time.now
+      ).group(:date).map do |day|
+        {
+          day: day.date.strftime("%B, #{ActiveSupport::Inflector.ordinalize(day.date.mday)}"),
+          total_distance: "#{day.total_distance.round(0)}km",
+          avg_price: "#{day.avg_price.round(2)}PLN",
+          avg_ride: "#{day.avg_distance.round(0)}km"
+        }
+      end
     end
   end
 end
