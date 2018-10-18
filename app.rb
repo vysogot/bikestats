@@ -1,21 +1,17 @@
 require 'bundler'
 require 'json'
-require 'sqlite3'
-require 'active_record'
-require 'active_support'
 
+require './db'
 require './lib/Timex'
 require './lib/Formatex'
 require './app/Trip'
-require './db'
 
 Bundler.require
 Loader.autoload
 
 class App < Rack::App
 
-  headers 'Access-Control-Allow-Origin' => '*',
-    'Access-Control-Expose-Headers' => 'X-My-Custom-Header, X-Another-Custom-Header'
+  headers 'Access-Control-Allow-Origin' => '*'
 
   serializer do |object|
     object.to_s
@@ -23,12 +19,9 @@ class App < Rack::App
 
   desc 'Create trip'
   get '/api/trips' do
-    unless params['start_address'] == nil
-      Trip.create!(params)
+    if Trip.create!(params)
       response.status = 201
       'Trip added!'
-    else
-      raise(StandardError,'Wrong parameters, dude!')
     end
   end
 
@@ -43,7 +36,7 @@ class App < Rack::App
   end
 
   error StandardError, NoMethodError do |ex|
-    {:error=>ex.message}
+    { :error => ex.message}
   end
 
 end

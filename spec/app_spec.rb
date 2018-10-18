@@ -106,7 +106,7 @@ describe App do
   describe 'raises error when wrong parameters for adding a trip' do
     subject{ get(url: '/api/trips') }
 
-    it { expect(subject.body.join).to eq '{:error=>"Wrong parameters, dude!"}' }
+    it { expect(subject.body.join).to eq '{:error=>"Validation failed: Start address can\'t be blank, Destination address can\'t be blank, Price can\'t be blank, Date can\'t be blank"}' }
   end
 
 end

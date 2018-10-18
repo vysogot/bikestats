@@ -3,6 +3,8 @@ class Trip < ActiveRecord::Base
   include Timex
   include Formatex
 
+  validates_presence_of :start_address, :destination_address, :price, :date
+
   class << self
     def weekly_stats
       week = select(Arel.sql('sum(price) as total_price, sum(distance) as total_distance')).where(
