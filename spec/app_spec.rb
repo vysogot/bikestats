@@ -42,8 +42,8 @@ describe App do
       days_in_current_week.times do |day_index|
         price = (day_index + 1) * 5
         trip = create(:trip, price: price,
-                 date: TimeHelper.beginning_of_the_week +
-                 day_index * TimeHelper.day_in_seconds)
+                 date: Timex.beginning_of_the_week +
+                 day_index * Timex.day_in_seconds)
 
         total_price += trip.price
         total_distance += trip.distance
@@ -51,13 +51,13 @@ describe App do
 
       # previous week
       create(:trip, price: 100,
-             date: TimeHelper.beginning_of_the_week -
-             TimeHelper.day_in_seconds)
+             date: Timex.beginning_of_the_week -
+             Timex.day_in_seconds)
 
       # next week
       create(:trip, price: 100, date:
-             TimeHelper.beginning_of_the_week +
-             8 * TimeHelper.day_in_seconds)
+             Timex.beginning_of_the_week +
+             8 * Timex.day_in_seconds)
 
       expect(JSON.parse(subject.body.join)).to eq({
         'total_distance' => "#{total_distance.round(0)}km",
@@ -80,7 +80,6 @@ describe App do
       create(:trip, date: Time.new(2018, 7, 4), price: 28.25, distance: 6)
 
       create(:trip, date: Time.new(2018, 7, 5), price: 15.5, distance: 3)
-
 
       Timecop.freeze(Time.new(2018, 7, 14)) do
         expect(JSON.parse(subject.body.join)).to eq(

@@ -1,4 +1,4 @@
-module TimeHelper
+module Timex
   def self.beginning_of_the_week
     days_till_monday = (Time.now.wday - 1) * day_in_seconds
     date = (Time.now - days_till_monday).strftime('%Y-%m-%d')

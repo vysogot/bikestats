@@ -3,7 +3,9 @@ require 'json'
 require 'sqlite3'
 require 'active_record'
 require 'active_support'
-require './lib/TimeHelper'
+
+require './lib/Timex'
+require './lib/Formatex'
 require './app/Trip'
 
 ActiveRecord::Migration.verbose = false
