@@ -1,3 +1,5 @@
+require 'active_support'
+
 module Formatex
   def self.distance(value)
     "#{value.round(0)}km"
