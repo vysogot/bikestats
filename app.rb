@@ -1,6 +1,7 @@
 require 'bundler'
 require 'json'
 require 'mongoid'
+require './lib/TimeHelper.rb'
 
 Bundler.require
 Loader.autoload
@@ -34,7 +35,7 @@ class App < Rack::App
 
   desc 'Get monthly stats'
   get '/api/stats/monthly' do
-    'Monthly stats!'
+    Trip.monthly_stats.to_json
   end
 
   error StandardError, NoMethodError do |ex|
