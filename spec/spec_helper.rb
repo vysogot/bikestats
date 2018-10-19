@@ -1,3 +1,5 @@
+ENV['APP_ENV'] = 'test'
+
 require_relative '../app'
 require 'json'
 require 'database_cleaner'

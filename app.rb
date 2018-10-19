@@ -1,3 +1,5 @@
+ENV['APP_ENV'] ||= 'development'
+
 require 'bundler'
 require 'json'
 
@@ -19,14 +21,35 @@ class App < Rack::App
 
   desc 'Describe API'
   get '/' do
-    { routes: ["/api/trips", "/api/stats/weekly", "/api/stats/monthly"] }.to_json
+    { routes: [
+      { post: [
+        { "/api/trips": { params: {
+          start_address: 'String',
+          destination_addres: 'String',
+          price: 'Numeric',
+          date: 'String' } } }
+      ] },
+      { get: [
+        { "/api/stats/weekly": { params: {} } },
+        { "/api/stats/monthly": { params: {} } }
+      ] }
+    ] }.to_json
   end
 
   desc 'Create trip'
-  get '/api/trips' do
-    if Trip.create!(params)
+  post '/api/trips' do
+
+    # hack to work both for rspec and curl
+    # replacing params makes it empty
+    params_json = nil
+
+    if params.empty? && request.body.present?
+      params_json = JSON.parse(request.body.read)
+    end
+
+    if Trip.create!(params_json || params)
       response.status = 201
-      'Trip added!'
+      { success: 'Trip added!' }
     end
   end
 
@@ -40,8 +63,8 @@ class App < Rack::App
     Trip.monthly_stats.to_json
   end
 
-  error StandardError, NoMethodError do |ex|
-    { :error => ex.message }.to_json
+  error StandardError, NoMethodError do |error|
+    { error: error.message }.to_json
   end
 
 end

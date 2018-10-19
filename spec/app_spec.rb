@@ -13,7 +13,7 @@ describe App do
 
   describe 'Adding a new trip' do
     subject {
-      get(url: '/api/trips', params: {
+      post(url: '/api/trips', params: {
         start_address: 'Poniatowskiego 2a, Otwock, Polska',
         destination_address: 'Plac Europejski 2, Warszawa, Polska',
         price: '10',
@@ -22,11 +22,11 @@ describe App do
     }
 
     it { expect(subject.status).to eq 201 }
-    it { expect(subject.body.join).to eq "Trip added!" }
+    it { expect(subject.body.join).to include("Trip added!") }
     it { expect{subject}.to change{Trip.count}.from(0).to(1) }
 
     describe 'Getting an error when wrong parameters are passed' do
-      subject{ get(url: '/api/trips') }
+      subject{ post(url: '/api/trips') }
 
       it { expect(subject.body.join).to include(
         "error",

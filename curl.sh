@@ -1,0 +1,1 @@
+curl -d '{"start_address":"Slowackiego 3, Otwock, Polska", "destination_address":"Plac Europejski 2, Warszawa, Polska", "price":"99.99", "date":"2018-10-17"}' -H "Content-Type: application/json" -X POST http://localhost:9292/api/trips
