@@ -21,7 +21,7 @@ class Trip < ActiveRecord::Base
 
   class << self
     def weekly_stats
-      week = select(Arel.sql('sum(price) as total_price, sum(distance) as total_distance')).where(
+      week = select(Arel.sql('max(id) as id, sum(price) as total_price, sum(distance) as total_distance')).where(
         date: Time.now.beginning_of_week..Time.now
       ).first
 

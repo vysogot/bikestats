@@ -17,6 +17,11 @@ class App < Rack::App
     object.to_s
   end
 
+  desc 'Describe API'
+  get '/' do
+    { routes: ["/api/trips", "/api/stats/weekly", "/api/stats/monthly"] }.to_json
+  end
+
   desc 'Create trip'
   get '/api/trips' do
     if Trip.create!(params)
@@ -36,7 +41,7 @@ class App < Rack::App
   end
 
   error StandardError, NoMethodError do |ex|
-    { :error => ex.message}
+    { :error => ex.message }.to_json
   end
 
 end
