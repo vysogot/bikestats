@@ -7,12 +7,14 @@ describe App do
 
   rack_app described_class
 
-  describe '/api/trips' do
-    subject {
-      allow_any_instance_of(Trip).to receive(:fetch_distance).and_return(nil)
+  before do
+    allow_any_instance_of(Trip).to receive(:fetch_distance)
+  end
 
+  describe 'Adding a new trip' do
+    subject {
       get(url: '/api/trips', params: {
-        start_address: 'Otwock',
+        start_address: 'Poniatowskiego 2a, Otwock, Polska',
         destination_address: 'Plac Europejski 2, Warszawa, Polska',
         price: '10',
         date: '30-10-2018'
@@ -21,59 +23,63 @@ describe App do
 
     it { expect(subject.status).to eq 201 }
     it { expect(subject.body.join).to eq "Trip added!" }
+    it { expect{subject}.to change{Trip.count}.from(0).to(1) }
 
-    it 'should add a trip to the database' do
-      expect{subject}.to change{Trip.count}.from(0).to(1)
+    describe 'Getting an error when wrong parameters are passed' do
+      subject{ get(url: '/api/trips') }
+
+      it { expect(subject.body.join).to include(
+        "error",
+        "Validation failed",
+        "Start address In not in 'Plac Europejski 2, Warszawa, Polska' format",
+        "Destination address In not in 'Plac Europejski 2, Warszawa, Polska' format",
+        "Date Is not in YYYY-mm-dd format",
+        "Price is not a number"
+      )}
     end
-
   end
 
-  describe 'Get weekly stats' do
+  describe 'Getting the weekly stats' do
     subject{ get(url: '/api/stats/weekly') }
 
     it { expect(subject.status).to eq 200 }
 
-    it 'should give us weekly stats' do
+    it 'should get stats from the current week' do
 
-      allow_any_instance_of(Trip).to receive(:fetch_distance)
+      # freeze on Sunday
+      Timecop.freeze(Time.new(2018, 10, 21)) do
+        create(:trip, price: 15, distance: 15, date: Time.now)
+        create(:trip, price: 5, distance: 5, date: Time.now - 3.days)
+        create(:trip, price: 29.75, distance: 20, date: Time.now - 6.days)
 
-      total_price = 0
-      total_distance = 0
-      days_in_current_week = Time.now.wday
+        # outside of scope
+        create(:trip, price: 15.5, distance: 3, date: Time.now - 7.days)
 
-      days_in_current_week.times do |day_index|
-        price = (day_index + 1) * 5
-        trip = create(:trip, price: price, date: Timex.beginning_of_the_week + day_index.days)
-
-        total_price += trip.price
-        total_distance += trip.distance
+        expect(JSON.parse(subject.body.join)).to eq(
+          JSON.parse('{
+            "total_distance": "40km",
+            "total_price":    "49.75PLN"
+          }')
+        )
       end
-
-      create(:trip, price: 100, date: Timex.beginning_of_the_week - 1.day)
-      create(:trip, price: 100, date: Timex.beginning_of_the_week + 8.days)
-
-      expect(JSON.parse(subject.body.join)).to eq({
-        'total_distance' => "#{total_distance.round(0)}km",
-        'total_price' => "#{total_price.round(2)}PLN"
-      })
     end
 
   end
 
-  describe 'Get monthly stats' do
+  describe 'Getting the monthly stats' do
     subject{ get(url: '/api/stats/monthly') }
 
     it { expect(subject.status).to eq 200 }
 
-    it 'should give us monthly stats' do
-
-      allow_any_instance_of(Trip).to receive(:fetch_distance)
+    it 'should get stats from the current month' do
 
       create(:trip, date: Time.new(2018, 7, 4), price: 15, distance: 2)
       create(:trip, date: Time.new(2018, 7, 4), price: 25, distance: 4)
       create(:trip, date: Time.new(2018, 7, 4), price: 28.25, distance: 6)
-
       create(:trip, date: Time.new(2018, 7, 5), price: 15.5, distance: 3)
+
+      # outside of scope
+      create(:trip, date: Time.new(2018, 6, 5), price: 15.5, distance: 3)
 
       Timecop.freeze(Time.new(2018, 7, 14)) do
         expect(JSON.parse(subject.body.join)).to eq(
@@ -94,13 +100,5 @@ describe App do
         )
       end
     end
-
   end
-
-  describe 'raises error when wrong parameters for adding a trip' do
-    subject{ get(url: '/api/trips') }
-
-    it { expect(subject.body.join).to eq '{:error=>"Validation failed: Start address can\'t be blank, Destination address can\'t be blank, Price can\'t be blank, Date can\'t be blank"}' }
-  end
-
 end

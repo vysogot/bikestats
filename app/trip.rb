@@ -1,9 +1,17 @@
 class Trip < ActiveRecord::Base
 
-  include Timex
   include Formatex
 
-  validates_presence_of :start_address, :destination_address, :price, :date
+  validates_format_of :start_address,
+    :destination_address,
+    :with => /.+,.+,.+/,
+    message: "In not in 'Plac Europejski 2, Warszawa, Polska' format"
+
+  validates_format_of :date,
+    :with => /\d{4}-\d{2}-\d{2}/,
+    message: "Is not in YYYY-mm-dd format"
+
+  validates_numericality_of :price
 
   after_create :fetch_distance
 
@@ -14,7 +22,7 @@ class Trip < ActiveRecord::Base
   class << self
     def weekly_stats
       week = select(Arel.sql('sum(price) as total_price, sum(distance) as total_distance')).where(
-        date: Timex.beginning_of_the_week..Time.now
+        date: Time.now.beginning_of_week..Time.now
       ).first
 
       {
@@ -25,7 +33,7 @@ class Trip < ActiveRecord::Base
 
     def monthly_stats
       select(:date, Arel.sql('avg(price) as avg_price, avg(distance) as avg_distance, sum(distance) as total_distance')).where(
-        date: Timex.beginning_of_the_month..Time.now
+        date: Time.now.beginning_of_month..Time.now
       ).group(:date).map do |day|
         {
           day: Formatex.date(day.date),

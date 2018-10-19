@@ -2,7 +2,6 @@ require 'bundler'
 require 'json'
 
 require './db'
-require './lib/timex'
 require './lib/formatex'
 require './app/distance_job'
 require './app/trip'
