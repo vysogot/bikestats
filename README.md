@@ -23,4 +23,5 @@ params:
 * date: String
 
 GET /api/stats/weekly
+
 GET /api/stats/monthly
