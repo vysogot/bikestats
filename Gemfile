@@ -3,9 +3,10 @@ source 'https://rubygems.org'
 gem 'rack'
 gem 'rack-app', require: 'rack/app'
 gem 'loader'
-gem 'async-http'
 gem 'activerecord'
 gem 'activesupport'
+gem 'activejob'
+gem 'rest-client'
 gem 'sqlite3'
 
 group :development do

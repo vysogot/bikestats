@@ -2,9 +2,10 @@ require 'bundler'
 require 'json'
 
 require './db'
-require './lib/Timex'
-require './lib/Formatex'
-require './app/Trip'
+require './lib/timex'
+require './lib/formatex'
+require './app/distance_job'
+require './app/trip'
 
 Bundler.require
 Loader.autoload

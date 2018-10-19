@@ -9,6 +9,8 @@ describe App do
 
   describe '/api/trips' do
     subject {
+      allow_any_instance_of(Trip).to receive(:fetch_distance).and_return(nil)
+
       get(url: '/api/trips',
           params: { start_address: 'Otwock',
                     destination_address: 'Plac Europejski 2, Warszawa, Polska',
@@ -35,6 +37,8 @@ describe App do
 
     it 'should give us weekly stats' do
 
+      allow_any_instance_of(Trip).to receive(:fetch_distance).and_return(nil)
+
       total_price = 0
       total_distance = 0
       days_in_current_week = Time.now.wday
@@ -42,8 +46,7 @@ describe App do
       days_in_current_week.times do |day_index|
         price = (day_index + 1) * 5
         trip = create(:trip, price: price,
-                 date: Timex.beginning_of_the_week +
-                 day_index * Timex.day_in_seconds)
+                 date: Timex.beginning_of_the_week + day_index.days)
 
         total_price += trip.price
         total_distance += trip.distance
@@ -51,13 +54,11 @@ describe App do
 
       # previous week
       create(:trip, price: 100,
-             date: Timex.beginning_of_the_week -
-             Timex.day_in_seconds)
+             date: Timex.beginning_of_the_week - 1.day)
 
       # next week
       create(:trip, price: 100, date:
-             Timex.beginning_of_the_week +
-             8 * Timex.day_in_seconds)
+             Timex.beginning_of_the_week + 8.days)
 
       expect(JSON.parse(subject.body.join)).to eq({
         'total_distance' => "#{total_distance.round(0)}km",
@@ -74,6 +75,8 @@ describe App do
 
 
     it 'should give us monthly stats' do
+
+      allow_any_instance_of(Trip).to receive(:fetch_distance).and_return(nil)
 
       create(:trip, date: Time.new(2018, 7, 4), price: 15, distance: 2)
       create(:trip, date: Time.new(2018, 7, 4), price: 25, distance: 4)
