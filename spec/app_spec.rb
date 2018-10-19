@@ -11,21 +11,19 @@ describe App do
     subject {
       allow_any_instance_of(Trip).to receive(:fetch_distance).and_return(nil)
 
-      get(url: '/api/trips',
-          params: { start_address: 'Otwock',
-                    destination_address: 'Plac Europejski 2, Warszawa, Polska',
-                    price: '10',
-                    date: '30-10-2018'}
-         )
+      get(url: '/api/trips', params: {
+        start_address: 'Otwock',
+        destination_address: 'Plac Europejski 2, Warszawa, Polska',
+        price: '10',
+        date: '30-10-2018'
+      })
     }
 
     it { expect(subject.status).to eq 201 }
     it { expect(subject.body.join).to eq "Trip added!" }
 
-    it 'should add it to the database' do
-      expect(Trip.count).to eq 0
-      subject
-      expect(Trip.count).to eq 1
+    it 'should add a trip to the database' do
+      expect{subject}.to change{Trip.count}.from(0).to(1)
     end
 
   end
@@ -37,7 +35,7 @@ describe App do
 
     it 'should give us weekly stats' do
 
-      allow_any_instance_of(Trip).to receive(:fetch_distance).and_return(nil)
+      allow_any_instance_of(Trip).to receive(:fetch_distance)
 
       total_price = 0
       total_distance = 0
@@ -45,20 +43,14 @@ describe App do
 
       days_in_current_week.times do |day_index|
         price = (day_index + 1) * 5
-        trip = create(:trip, price: price,
-                 date: Timex.beginning_of_the_week + day_index.days)
+        trip = create(:trip, price: price, date: Timex.beginning_of_the_week + day_index.days)
 
         total_price += trip.price
         total_distance += trip.distance
       end
 
-      # previous week
-      create(:trip, price: 100,
-             date: Timex.beginning_of_the_week - 1.day)
-
-      # next week
-      create(:trip, price: 100, date:
-             Timex.beginning_of_the_week + 8.days)
+      create(:trip, price: 100, date: Timex.beginning_of_the_week - 1.day)
+      create(:trip, price: 100, date: Timex.beginning_of_the_week + 8.days)
 
       expect(JSON.parse(subject.body.join)).to eq({
         'total_distance' => "#{total_distance.round(0)}km",
@@ -73,10 +65,9 @@ describe App do
 
     it { expect(subject.status).to eq 200 }
 
-
     it 'should give us monthly stats' do
 
-      allow_any_instance_of(Trip).to receive(:fetch_distance).and_return(nil)
+      allow_any_instance_of(Trip).to receive(:fetch_distance)
 
       create(:trip, date: Time.new(2018, 7, 4), price: 15, distance: 2)
       create(:trip, date: Time.new(2018, 7, 4), price: 25, distance: 4)
@@ -99,8 +90,8 @@ describe App do
               "avg_ride":       "3km",
               "avg_price":      "15.5PLN"
             }
-          ]'
-        ))
+          ]')
+        )
       end
     end
 
