@@ -10,9 +10,9 @@ Rack based API for adding bike trips and getting weekly and monthly stats. It ge
   $ bundle exec rackup
 ```
 
-## Example request
+## Example requests
 
-Run `./curl.sh` to create a trip
+Run `./curl.sh` to create 3 trips
 
 ## API
 
