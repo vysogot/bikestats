@@ -1,12 +1,8 @@
 ENV['APP_ENV'] ||= 'development'
+require './db'
 
 require 'bundler'
 require 'json'
-
-require './db'
-require './lib/formatex'
-require './app/distance_job'
-require './app/trip'
 
 Bundler.require
 Loader.autoload
@@ -14,10 +10,6 @@ Loader.autoload
 class App < Rack::App
 
   headers 'Access-Control-Allow-Origin' => '*'
-
-  serializer do |object|
-    object.to_s
-  end
 
   desc 'Describe API'
   get '/' do
@@ -40,7 +32,7 @@ class App < Rack::App
   post '/api/trips' do
 
     # hack to work both for rspec and curl
-    # replacing params makes it empty
+    # can't set content-type header in rspec
     params_json = nil
 
     if params.empty? && request.body.present?
@@ -49,7 +41,7 @@ class App < Rack::App
 
     if Trip.create!(params_json || params)
       response.status = 201
-      { success: 'Trip added!' }
+      { success: 'Trip added!' }.to_json
     end
   end
 

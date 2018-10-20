@@ -1,6 +1,10 @@
 ENV['APP_ENV'] = 'test'
 
 require_relative '../app'
+
+require './lib/formatex'
+require './app/trip'
+
 require 'json'
 require 'database_cleaner'
 require 'factory_bot'
