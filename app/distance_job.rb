@@ -12,28 +12,40 @@ class DistanceJob < ActiveJob::Base
 
     start = locate(trip.start_address)
     destination = locate(trip.destination_address)
-
     distance = fetch_distance(start, destination)
 
     trip.update_attribute(:distance, distance)
   end
 
   def locate(address)
-    response = RestClient.get(OPENROUTE_URI + 'geocode/search?api_key=' + OPENROUTE_API_KEY +
-                              '&text=' + URI.encode(address), HEADERS)
-    coordinates = JSON.parse(response.body)["features"].first["geometry"]["coordinates"]
+    response = RestClient.get(OPENROUTE_URI +
+                             'geocode/search?api_key=' + OPENROUTE_API_KEY +
+                             '&text=' + URI.encode(address),
+                             HEADERS)
 
-    { latitude: coordinates[0], longitude: coordinates[1] }
+    json_body = JSON.parse(response.body)
+    coordinates = json_body["features"].first["geometry"]["coordinates"]
+
+    return {
+      latitude: coordinates[0],
+      longitude: coordinates[1]
+    }
   end
 
   def fetch_distance(start, destination)
-    coordinates = "#{start[:latitude]},#{start[:longitude]}|#{destination[:latitude]},#{destination[:longitude]}"
+    coordinates = "#{start[:latitude]},#{start[:longitude]}|"\
+                  "#{destination[:latitude]},#{destination[:longitude]}"
 
-    response = RestClient.get(OPENROUTE_URI + 'directions?api_key=' + OPENROUTE_API_KEY +
+    response = RestClient.get(OPENROUTE_URI +
+                              'directions?api_key=' + OPENROUTE_API_KEY +
                               '&coordinates=' + URI.encode(coordinates) +
-                              '&profile=cycling-road', HEADERS)
+                              '&profile=cycling-road',
+                              HEADERS)
 
-    distance_in_meters = JSON.parse(response.body)["routes"].first["summary"]["distance"]
-    (distance_in_meters/1000).round(0)
+    json_body = JSON.parse(response.body)
+    distance_in_meters = json_body["routes"].first["summary"]["distance"]
+    distance_in_kilometers = (distance_in_meters/1000).round(0)
+
+    return distance_in_kilometers
   end
 end

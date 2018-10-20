@@ -30,7 +30,15 @@ class App < Rack::App
 
   desc 'Create trip'
   post '/api/trips' do
-    if Trip.create!(params)
+
+    # work both with json and x-www-form-urlencoded
+    params_json = nil
+
+    if params.empty? && request.body.present?
+      params_json = JSON.parse(request.body.read)
+    end
+
+    if Trip.create!(params_json || params)
       response.status = 201
       { success: 'Trip added!' }.to_json
     end

@@ -31,9 +31,9 @@ describe App do
       it { expect(subject.body.join).to include(
         "error",
         "Validation failed",
-        "Start address In not in 'Plac Europejski 2, Warszawa, Polska' format",
-        "Destination address In not in 'Plac Europejski 2, Warszawa, Polska' format",
-        "Date Is not in YYYY-mm-dd format",
+        "Start address In not in 'Street, City, Country' format",
+        "Destination address In not in 'Street, City, Country' format",
+        "Date Is not in 'YYYY-mm-dd' format",
         "Price is not a number"
       )}
     end
@@ -52,7 +52,7 @@ describe App do
         create(:trip, price: 5, distance: 5, date: Time.now - 3.days)
         create(:trip, price: 29.75, distance: 20, date: Time.now - 6.days)
 
-        # outside of scope
+        # outside of the current week
         create(:trip, price: 15.5, distance: 3, date: Time.now - 7.days)
 
         expect(JSON.parse(subject.body.join)).to eq(
@@ -78,7 +78,7 @@ describe App do
       create(:trip, date: Time.new(2018, 7, 4), price: 28.25, distance: 6)
       create(:trip, date: Time.new(2018, 7, 5), price: 15.5, distance: 3)
 
-      # outside of scope
+      # outside of the current month
       create(:trip, date: Time.new(2018, 6, 5), price: 15.5, distance: 3)
 
       Timecop.freeze(Time.new(2018, 7, 14)) do

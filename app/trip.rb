@@ -5,11 +5,11 @@ class Trip < ActiveRecord::Base
   validates_format_of :start_address,
     :destination_address,
     :with => /.+,.+,.+/,
-    message: "In not in 'Plac Europejski 2, Warszawa, Polska' format"
+    message: "In not in 'Street, City, Country' format"
 
   validates_format_of :date,
     :with => /\d{4}-\d{2}-\d{2}/,
-    message: "Is not in YYYY-mm-dd format"
+    message: "Is not in 'YYYY-mm-dd' format"
 
   validates_numericality_of :price
 
@@ -21,7 +21,11 @@ class Trip < ActiveRecord::Base
 
   class << self
     def weekly_stats
-      week = select(Arel.sql('max(id) as id, sum(price) as total_price, sum(distance) as total_distance')).where(
+      week = select(
+        Arel.sql('max(id) as id,
+                 sum(price) as total_price,
+                 sum(distance) as total_distance')
+      ).where(
         date: Time.now.beginning_of_week..Time.now
       ).first
 
@@ -32,7 +36,12 @@ class Trip < ActiveRecord::Base
     end
 
     def monthly_stats
-      select(:date, Arel.sql('avg(price) as avg_price, avg(distance) as avg_distance, sum(distance) as total_distance')).where(
+      select(
+        :date,
+        Arel.sql('avg(price) as avg_price,
+                 avg(distance) as avg_distance,
+                 sum(distance) as total_distance')
+      ).where(
         date: Time.now.beginning_of_month..Time.now
       ).group(:date).map do |day|
         {
