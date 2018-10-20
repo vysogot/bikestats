@@ -12,7 +12,7 @@ Rack based API for adding bike trips and getting weekly and monthly stats. It ge
 
 ## Example requests
 
-Run `./curl.sh` to create 3 trips
+Run `./curl.sh` to create 3 trips and see the stats. Make sure you have `json_pp` available.
 
 ## API
 
