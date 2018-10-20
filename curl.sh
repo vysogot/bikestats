@@ -19,10 +19,10 @@ echo -e "\nBackgroud jobs fetching distances..."
 sleep 1
 
 echo -e "\nWeekly stats:\n"
-curl http://localhost:9292/api/stats/weekly
+curl -s http://localhost:9292/api/stats/weekly | json_pp
 echo -e
 sleep .2
 
 echo -e "\nMonthly stats:\n"
-curl http://localhost:9292/api/stats/monthly
+curl -s http://localhost:9292/api/stats/monthly | json_pp
 echo -e "\n\nThanks!\n"
