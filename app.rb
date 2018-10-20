@@ -30,16 +30,7 @@ class App < Rack::App
 
   desc 'Create trip'
   post '/api/trips' do
-
-    # hack to work both for rspec and curl
-    # can't set content-type header in rspec
-    params_json = nil
-
-    if params.empty? && request.body.present?
-      params_json = JSON.parse(request.body.read)
-    end
-
-    if Trip.create!(params_json || params)
+    if Trip.create!(params)
       response.status = 201
       { success: 'Trip added!' }.to_json
     end
