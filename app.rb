@@ -54,7 +54,7 @@ class App < Rack::App
     Trip.monthly_stats.to_json
   end
 
-  error StandardError, NoMethodError do |error|
+  error ActiveRecord::RecordInvalid do |error|
     { error: error.message }.to_json
   end
 

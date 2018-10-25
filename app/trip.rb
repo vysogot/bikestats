@@ -22,11 +22,11 @@ class Trip < ActiveRecord::Base
   class << self
     def weekly_stats
       week = select(
-        Arel.sql('max(id) as id,
-                 sum(price) as total_price,
-                 sum(distance) as total_distance')
+          arel_table[:id].maximum.as('id'),
+          arel_table[:price].sum.as('total_price'),
+          arel_table[:distance].sum.as('total_distance')
       ).where(
-        date: Time.now.beginning_of_week..Time.now
+          date: Time.now.beginning_of_week..Time.now
       ).first
 
       {
@@ -38,9 +38,9 @@ class Trip < ActiveRecord::Base
     def monthly_stats
       select(
         :date,
-        Arel.sql('avg(price) as avg_price,
-                 avg(distance) as avg_distance,
-                 sum(distance) as total_distance')
+        arel_table[:price].average.as('avg_price'),
+        arel_table[:distance].average.as('avg_distance'),
+        arel_table[:distance].sum.as('total_distance')
       ).where(
         date: Time.now.beginning_of_month..Time.now
       ).group(:date).map do |day|
