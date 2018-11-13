@@ -7,8 +7,13 @@ Rack based API for adding bike trips and getting weekly and monthly stats. It ge
 ```
   $ bundle install
   $ bundle exec rspec
-  $ bundle exec rackup
 ```
+
+## Running the app
+
+The app uses OpenRouteService API so be sure to provide it with the key
+
+`OPENROUTE_API_KEY=your_key_here bundle exec rackup`
 
 ## Example requests
 

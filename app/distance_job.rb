@@ -3,7 +3,7 @@ require 'rest-client'
 
 class DistanceJob < ActiveJob::Base
 
-  OPENROUTE_API_KEY = '5b3ce3597851110001cf6248a55293af96ad4bdf94fa58435b55181a'
+  OPENROUTE_API_KEY = ENV['OPENROUTE_API_KEY'] || ""
   OPENROUTE_URI = 'https://api.openrouteservice.org/'
   HEADERS = { :accept => 'application/json; charset=utf-8' }
 
@@ -33,8 +33,8 @@ class DistanceJob < ActiveJob::Base
   end
 
   def fetch_distance(start, destination)
-    coordinates = start[:latitude] + "," + start[:longitude] + "|" +
-                  destination[:latitude] + "," + destination[:longitude]
+    coordinates = start[:latitude].to_s + "," + start[:longitude].to_s + "|" +
+                  destination[:latitude].to_s + "," + destination[:longitude].to_s
 
     response = RestClient.get(OPENROUTE_URI +
                               'directions?api_key=' + OPENROUTE_API_KEY +
