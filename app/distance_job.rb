@@ -33,8 +33,8 @@ class DistanceJob < ActiveJob::Base
   end
 
   def fetch_distance(start, destination)
-    coordinates = "#{start[:latitude]},#{start[:longitude]}|"\
-                  "#{destination[:latitude]},#{destination[:longitude]}"
+    coordinates = start[:latitude] + "," + start[:longitude] + "|" +
+                  destination[:latitude] + "," + destination[:longitude]
 
     response = RestClient.get(OPENROUTE_URI +
                               'directions?api_key=' + OPENROUTE_API_KEY +

@@ -22,11 +22,11 @@ class Trip < ActiveRecord::Base
   class << self
     def weekly_stats
       week = select(
-          arel_table[:id].maximum.as('id'),
-          arel_table[:price].sum.as('total_price'),
-          arel_table[:distance].sum.as('total_distance')
+        arel_table[:id].maximum.as('id'),
+        arel_table[:price].sum.as('total_price'),
+        arel_table[:distance].sum.as('total_distance')
       ).where(
-          date: Time.now.beginning_of_week..Time.now
+        date: Time.now.beginning_of_week..Time.now
       ).first
 
       {
