@@ -9,6 +9,7 @@ gem 'activejob'
 gem 'rest-client'
 gem 'sqlite3'
 gem 'grape'
+gem 'grape-swagger'
 
 group :development do
   gem 'rspec'

@@ -5,11 +5,11 @@ class Trip < ActiveRecord::Base
   validates_format_of :start_address,
     :destination_address,
     :with => /.+,.+,.+/,
-    message: "In not in 'Street, City, Country' format"
+    message: "is not in 'Street, City, Country' format"
 
   validates_format_of :date,
     :with => /\d{4}-\d{2}-\d{2}/,
-    message: "Is not in 'YYYY-mm-dd' format"
+    message: "is not in 'YYYY-mm-dd' format"
 
   validates_numericality_of :price
 

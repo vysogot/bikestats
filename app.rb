@@ -12,25 +12,16 @@ class App < Grape::API
   format :json
   prefix :api
 
-  desc 'Describe API'
-  get '/' do
-    { routes: [
-      { post: [
-        { "/api/trips": { params: {
-          start_address: 'String',
-          destination_addres: 'String',
-          price: 'Numeric',
-          date: 'String' } } }
-      ] },
-      { get: [
-        { "/api/stats/weekly": { params: {} } },
-        { "/api/stats/monthly": { params: {} } }
-      ] }
-    ] }.to_json
-  end
-
   resource :trips do
     desc 'Create trip'
+
+    params do
+      requires :start_address,
+        :destination_address,
+        :date,
+        :price, type: String
+    end
+
     post do
 
       # work both with json and x-www-form-urlencoded
@@ -66,5 +57,12 @@ class App < Grape::API
   #error ActiveRecord::RecordInvalid do |error|
   #  { error: error.message }.to_json
   #end
+
+  add_swagger_documentation hide_documentation_path: true,
+    api_version: 'v1',
+    info: {
+      title: 'Bikeramp',
+      description: 'Get the stats of your bike rides!'
+    }
 
 end

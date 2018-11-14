@@ -33,3 +33,5 @@ params:
 GET /api/stats/weekly
 GET /api/stats/monthly
 ```
+
+Also, check out Swagger documentation at `/api/swagger_doc`

@@ -22,7 +22,7 @@ describe App do
       post('/api/trips', {
         start_address: 'Poniatowskiego 2a, Otwock, Polska',
         destination_address: 'Plac Europejski 2, Warszawa, Polska',
-        price: '10',
+        price: 10,
         date: '30-10-2018'
       })
     }
@@ -32,12 +32,17 @@ describe App do
     it { expect{subject}.to change{Trip.count}.from(0).to(1) }
 
     describe 'Getting an error when wrong parameters are passed' do
-      subject{ post('/api/trips', { start_address: '' }) }
+      subject{ post('/api/trips', {
+        start_address: '',
+        destination_address: '',
+        price: '',
+        date: ''
+      }) }
 
       it { expect(subject.body).to include(
-        "Start address In not in 'Street, City, Country' format",
-        "Destination address In not in 'Street, City, Country' format",
-        "Date Is not in 'YYYY-mm-dd' format",
+        "Start address is not in 'Street, City, Country' format",
+        "Destination address is not in 'Street, City, Country' format",
+        "Date is not in 'YYYY-mm-dd' format",
         "Price is not a number"
       )}
     end
