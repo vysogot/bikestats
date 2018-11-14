@@ -7,9 +7,10 @@ require 'json'
 Bundler.require
 Loader.autoload
 
-class App < Rack::App
+class App < Grape::API
 
-  headers 'Access-Control-Allow-Origin' => '*'
+  format :json
+  prefix :api
 
   desc 'Describe API'
   get '/' do
@@ -28,34 +29,42 @@ class App < Rack::App
     ] }.to_json
   end
 
-  desc 'Create trip'
-  post '/api/trips' do
+  resource :trips do
+    desc 'Create trip'
+    post do
 
-    # work both with json and x-www-form-urlencoded
-    params_json = nil
+      # work both with json and x-www-form-urlencoded
+      params_json = nil
 
-    if params.empty? && request.body.present?
-      params_json = JSON.parse(request.body.read)
+      if params.empty? && request.body.present?
+        params_json = JSON.parse(request.body.read)
+      end
+
+      trip = Trip.new(params_json || params)
+
+      if trip.save
+        status = 201
+        return { success: 'Trip added!' }
+      else
+        trip.errors.full_messages
+      end
+    end
+  end
+
+  resource :stats do
+    desc 'Get weekly stats'
+    get :weekly do
+      Trip.weekly_stats
     end
 
-    if Trip.create!(params_json || params)
-      response.status = 201
-      { success: 'Trip added!' }.to_json
+    desc 'Get monthly stats'
+    get :monthly do
+      Trip.monthly_stats
     end
   end
 
-  desc 'Get weekly stats'
-  get '/api/stats/weekly' do
-    Trip.weekly_stats.to_json
-  end
-
-  desc 'Get monthly stats'
-  get '/api/stats/monthly' do
-    Trip.monthly_stats.to_json
-  end
-
-  error ActiveRecord::RecordInvalid do |error|
-    { error: error.message }.to_json
-  end
+  #error ActiveRecord::RecordInvalid do |error|
+  #  { error: error.message }.to_json
+  #end
 
 end

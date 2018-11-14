@@ -1,19 +1,25 @@
 require 'spec_helper'
 require 'rack/app/test'
+require 'rack/test'
 
 describe App do
 
   include Rack::App::Test
+  include Rack::Test::Methods
 
   rack_app described_class
+
+  def app
+    App.new
+  end
 
   before do
     allow_any_instance_of(Trip).to receive(:fetch_distance)
   end
 
-  describe 'Adding a new trip' do
+  context 'Adding a new trip' do
     subject {
-      post(url: '/api/trips', params: {
+      post('/api/trips', {
         start_address: 'Poniatowskiego 2a, Otwock, Polska',
         destination_address: 'Plac Europejski 2, Warszawa, Polska',
         price: '10',
@@ -22,15 +28,13 @@ describe App do
     }
 
     it { expect(subject.status).to eq 201 }
-    it { expect(subject.body.join).to include("Trip added!") }
+    it { expect(subject.body).to include("Trip added!") }
     it { expect{subject}.to change{Trip.count}.from(0).to(1) }
 
     describe 'Getting an error when wrong parameters are passed' do
-      subject{ post(url: '/api/trips') }
+      subject{ post('/api/trips', { start_address: '' }) }
 
-      it { expect(subject.body.join).to include(
-        "error",
-        "Validation failed",
+      it { expect(subject.body).to include(
         "Start address In not in 'Street, City, Country' format",
         "Destination address In not in 'Street, City, Country' format",
         "Date Is not in 'YYYY-mm-dd' format",
@@ -39,8 +43,8 @@ describe App do
     end
   end
 
-  describe 'Getting the weekly stats' do
-    subject{ get(url: '/api/stats/weekly') }
+  context 'Getting the weekly stats' do
+    subject{ get('/api/stats/weekly') }
 
     it { expect(subject.status).to eq 200 }
 
@@ -55,7 +59,7 @@ describe App do
         # outside of the current week
         create(:trip, price: 15.5, distance: 3, date: Time.now - 7.days)
 
-        expect(JSON.parse(subject.body.join)).to eq(
+        expect(JSON.parse(subject.body)).to eq(
           JSON.parse('{
             "total_distance": "40km",
             "total_price":    "49.75PLN"
@@ -66,8 +70,8 @@ describe App do
 
   end
 
-  describe 'Getting the monthly stats' do
-    subject{ get(url: '/api/stats/monthly') }
+  context 'Getting the monthly stats' do
+    subject{ get('/api/stats/monthly') }
 
     it { expect(subject.status).to eq 200 }
 
@@ -82,7 +86,7 @@ describe App do
       create(:trip, date: Time.new(2018, 6, 5), price: 15.5, distance: 3)
 
       Timecop.freeze(Time.new(2018, 7, 14)) do
-        expect(JSON.parse(subject.body.join)).to eq(
+        expect(JSON.parse(subject.body)).to eq(
           JSON.parse('[
             {
               "day":           "July, 4th",
