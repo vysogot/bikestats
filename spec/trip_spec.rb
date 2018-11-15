@@ -8,9 +8,6 @@ describe Trip do
   rack_app described_class
 
   describe 'Validations' do
-    before do
-      allow_any_instance_of(Trip).to receive(:fetch_distance)
-    end
 
     it 'works with all parameters properly formatted' do
       expect {
@@ -35,7 +32,9 @@ describe Trip do
         create(:trip, price: '17,-')
       }.to raise_error(ActiveRecord::RecordInvalid)
     end
+
   end
+
 end
 
 

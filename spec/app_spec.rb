@@ -14,7 +14,9 @@ describe App do
   end
 
   before do
-    allow_any_instance_of(Trip).to receive(:fetch_distance)
+    allow_any_instance_of(TripService).to(
+      receive(:fetch_distance).and_return(true)
+    )
   end
 
   context 'Adding a new trip' do

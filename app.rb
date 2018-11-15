@@ -31,7 +31,7 @@ class App < Grape::API
         params_json = JSON.parse(request.body.read)
       end
 
-      trip = Trip.new(params_json || params)
+      trip = TripService.new(params_json || params)
 
       if trip.save
         status = 201
@@ -45,18 +45,14 @@ class App < Grape::API
   resource :stats do
     desc 'Get weekly stats'
     get :weekly do
-      Trip.weekly_stats
+      TripStats.weekly
     end
 
     desc 'Get monthly stats'
     get :monthly do
-      Trip.monthly_stats
+      TripStats.monthly
     end
   end
-
-  #error ActiveRecord::RecordInvalid do |error|
-  #  { error: error.message }.to_json
-  #end
 
   add_swagger_documentation hide_documentation_path: true,
     api_version: 'v1',
