@@ -11,6 +11,10 @@ gem 'sqlite3'
 gem 'grape'
 gem 'grape-swagger'
 
+group :development do
+  gem 'byebug'
+end
+
 group :test do
   gem 'database_cleaner'
   gem 'timecop'
