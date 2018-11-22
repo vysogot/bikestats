@@ -59,7 +59,7 @@ GEM
     mustermann-grape (1.0.0)
       mustermann (~> 1.0.0)
     netrc (0.11.0)
-    rack (1.6.4)
+    rack (2.0.6)
     rack-accept (0.4.5)
       rack (>= 0.4)
     rack-app (0.14.0)
@@ -110,7 +110,7 @@ DEPENDENCIES
   grape
   grape-swagger
   loader
-  rack
+  rack (>= 1.6.11)
   rack-app
   rack-test
   rest-client

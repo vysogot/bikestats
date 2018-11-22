@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rack'
+gem 'rack', ">= 1.6.11"
 gem 'rack-app', require: 'rack/app'
 gem 'loader'
 gem 'activerecord'
