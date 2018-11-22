@@ -1,4 +1,5 @@
 require_relative './trip'
+require_relative './trip_decorator'
 
 class TripStats
 
@@ -15,9 +16,11 @@ class TripStats
         date: Time.now.beginning_of_week..Time.now
       ).first
 
+      week = TripDecorator.new(week)
+
       {
-        total_distance: Formatex.distance(week.total_distance),
-        total_price: Formatex.price(week.total_price)
+        total_distance: week.total_distance,
+        total_price: week.total_price
       }
     end
 
@@ -30,11 +33,14 @@ class TripStats
       ).where(
         date: Time.now.beginning_of_month..Time.now
       ).group(:date).map do |day|
+
+        day = TripDecorator.new(day)
+
         {
-          day: Formatex.date(day.date),
-          total_distance: Formatex.distance(day.total_distance),
-          avg_price: Formatex.price(day.avg_price),
-          avg_ride: Formatex.distance(day.avg_distance)
+          day: day.date,
+          total_distance: day.total_distance,
+          avg_price: day.avg_price,
+          avg_ride: day.avg_distance
         }
       end
     end
