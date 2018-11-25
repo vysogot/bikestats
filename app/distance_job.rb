@@ -1,5 +1,5 @@
 require 'active_job'
-require 'rest-client'
+require 'open_route_client'
 
 class DistanceJob < ActiveJob::Base
   def perform(trip_id)

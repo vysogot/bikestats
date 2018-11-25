@@ -10,6 +10,7 @@ gem 'rest-client'
 gem 'sqlite3'
 gem 'grape'
 gem 'grape-swagger'
+gem 'open_route_client'
 
 group :development, :test do
   gem 'byebug'

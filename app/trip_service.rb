@@ -1,3 +1,5 @@
+require_relative './trip'
+
 class TripService
 
   attr_accessor :trip
