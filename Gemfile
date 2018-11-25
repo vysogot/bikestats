@@ -11,7 +11,7 @@ gem 'sqlite3'
 gem 'grape'
 gem 'grape-swagger'
 
-group :development do
+group :development, :test do
   gem 'byebug'
 end
 
